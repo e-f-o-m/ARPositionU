@@ -61,7 +61,7 @@ public class Login : MonoBehaviour
 
     void Start()
     {
-        LoadingPanel.SetActive(true);
+        //LoadingPanel.SetActive(true);
         slider = GameObject.Find("Slider").GetComponent<Slider>();
         StartCoroutine(LoadingScene(0.02f));
 
@@ -150,6 +150,7 @@ public class Login : MonoBehaviour
 
     public void CancelarReg()
     {
+        Debug.Log("Debe salir y abrir scena ARCam");
         newScene.LoadScene("ARCam");
     }
 
