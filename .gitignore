@@ -60,3 +60,18 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+-----------------------------------
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+[Tt]humbs.db
+[Dd]esktop.ini
+
+# Visual Studio / MonoDevelop generated
+# =====================================
+[Ee]xported[Oo]bj/
+
+*.stackdump
