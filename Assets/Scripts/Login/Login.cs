@@ -1,5 +1,5 @@
+using System;
 using System.Collections;
-
 /* TODO: descargar
 com.google.external-dependency-manager-1.2.170.tgz
 com.google.firebase.app-8.9.0.tgz
@@ -8,37 +8,43 @@ com.google.firebase.database-8.9.0.tgz
 
 mover a la ruta "/GooglePackages/
 */
-
 /* TODO:
  * Falta Pasar los datos del usuario a la database de firebase (La contraseña no, sino el token)
  * Problemas con codigo asincrono: async await: no entra en newScene en login
  * Buscar que mas falta...
  */
 using System.Collections.Generic;
-using System;
 using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.UI;
 using Firebase;
-using UnityEngine.SceneManagement;
 using Myscenes;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Login : MonoBehaviour
 {
     Firebase.Auth.FirebaseAuth auth = null;
+
     Firebase.Auth.FirebaseUser user = null;
 
     [Header("Register")]
     public GameObject correoEtRe;
-    public GameObject contrasenaEtRe;
-    public GameObject nombreEtRe;
-    public GameObject codigoEtRe;
-    public GameObject cancelarBtnRe;
-    public GameObject aceptarBtnRe;
-    public GameObject iniciarSesionBtnRe;
 
+    public GameObject contrasenaEtRe;
+
+    public GameObject nombreEtRe;
+
+    public GameObject codigoEtRe;
+    public GameObject retroalimentacionTxRc;
+    public GameObject retroalimentacionTxRe;
+    public GameObject retroalimentacionTxLo;
+
+    /*     public GameObject cancelarBtnRe;
+    public GameObject aceptarBtnRe;
+    public GameObject iniciarSesionBtnRe; */
     [Header("Login")]
     public GameObject correoEtLo;
+
     public GameObject contrasenaEtLo;
 
     [Header("Reset")]
@@ -46,65 +52,81 @@ public class Login : MonoBehaviour
 
     [Header("Other")]
     public GameObject LoginPanel;
+
     public GameObject RegisterPanel;
+
     public GameObject RecuperarPanel;
 
-
     public GameObject LoadingPanel;
+
     private Slider slider;
 
     private int T_LOGIN = 0;
+
     private int T_REGISTER = 1;
+
     private int T_RECUPERAR = 2;
 
     private Myscenes.Scenes newScene = new Myscenes.Scenes();
 
     void Start()
     {
-        //LoadingPanel.SetActive(true);
+        LoadingPanel.SetActive(true);
         slider = GameObject.Find("Slider").GetComponent<Slider>();
-        StartCoroutine(LoadingScene(0.02f));
+        //await StartCoroutine(LoadingScene(0.03f));
+        //loadingAsync(0.03f);
+        CheckUser();
 
-        Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
-        {
-            var dependencyStatus = task.Result;
-            if (dependencyStatus == Firebase.DependencyStatus.Available)
-            {
-                auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
-                user = auth.CurrentUser;
-
-                Debug.Log("user " + user.Email);
-            }
-            else
-            {
-                Debug.LogError(System.String.Format(
-                  "xxxxxxxxx Could not resolve all Firebase dependencies: {0}", dependencyStatus));
-            }
-        });
     }
 
-    IEnumerator LoadingScene(float speed)
+
+    async void CheckUser()
     {
-        slider.value = 0.0f;
-        float value = 0.0f;
+        slider.value = 40.0f;
+        await Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+            {
+                
+                var dependencyStatus = task.Result;
+                try
+                {
+                    if (dependencyStatus == Firebase.DependencyStatus.Available)
+                    {
+                        auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+                        if (auth.CurrentUser != null)
+                        {
+                            user = auth.CurrentUser;
+                            Debug.Log("User logged in");
+                            /* newScene.newScene(Scenes.MainMenu); */
+                        }
+                        else
+                        {
+                            Debug.Log("User not logged in");
+                            /* LoadingPanel.SetActive(false);
+                            LoginPanel.SetActive(true); */
+                        }
 
-        while (value <= 100.0f)
-        {
-            yield return new WaitForSeconds(speed);
-            slider.value = value;
-            value += 10.0f;
-        }
+                    }
+                }
+                catch (System.Exception)
+                {
+                    Debug.LogError(System.String.Format("Could not resolve all Firebase dependencies: {0}", dependencyStatus));
+                }
+                return;
+
+            });
+        slider.value = 100.0f;
         LoadingPanel.SetActive(false);
+        
     }
-
 
     public void AceptarAllLogin(int type)
     {
         LoadingPanel.SetActive(true);
-        StartCoroutine(LoadingScene(0.03f));
+        slider.value = 40.0f;
         if (type == T_REGISTER)
         {
-            string stCorreoEtRe = correoEtRe.GetComponent<UnityEngine.UI.InputField>().text.Trim();
+            string stCorreoEtRe =
+                correoEtRe.GetComponent<UnityEngine.UI.InputField>().text.Trim();
             string stContrasenaEtRe = contrasenaEtRe.GetComponent<UnityEngine.UI.InputField>().text;
             string stNombreEtRe = nombreEtRe.GetComponent<UnityEngine.UI.InputField>().text;
             string stCodigoEtRe = codigoEtRe.GetComponent<UnityEngine.UI.InputField>().text;
@@ -119,8 +141,13 @@ public class Login : MonoBehaviour
         }
         else if (type == T_LOGIN)
         {
-            string stCorreoEtLo = correoEtLo.GetComponent<UnityEngine.UI.InputField>().text.Trim();
-            string stContrasenaEtLo = contrasenaEtLo.GetComponent<UnityEngine.UI.InputField>().text;
+            string stCorreoEtLo =
+                correoEtLo
+                    .GetComponent<UnityEngine.UI.InputField>()
+                    .text
+                    .Trim();
+            string stContrasenaEtLo =
+                contrasenaEtLo.GetComponent<UnityEngine.UI.InputField>().text;
             if (stCorreoEtLo != "" && stContrasenaEtLo != "")
             {
                 SingIn(stCorreoEtLo, stContrasenaEtLo);
@@ -150,7 +177,6 @@ public class Login : MonoBehaviour
 
     public void CancelarReg()
     {
-        Debug.Log("Debe salir y abrir scena ARCam");
         newScene.LoadScene("ARCam");
     }
 
@@ -174,9 +200,7 @@ public class Login : MonoBehaviour
         correoEtRc.GetComponent<UnityEngine.UI.InputField>().text = "";
     }
 
-
     // ====================== FIREBASE ======================
-
     public void SingIn(string email, string password)
     {
         auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWith(task =>
@@ -188,7 +212,7 @@ public class Login : MonoBehaviour
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("xxxxxx SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
+                Debug.LogError("xxxxxx SignInWithEmailAndPasswordAsync encountered an error: " +task.Exception);
                 return;
             }
             user = task.Result;
@@ -199,53 +223,57 @@ public class Login : MonoBehaviour
             {
                 //FIXME: no ejecuta las funciones
                 Debug.Log("========== Debe entrar aquí===========");
-                LoginPanel.SetActive(false);
-                RegisterPanel.SetActive(false);
-                RecuperarPanel.SetActive(false);
-                this.newScene.LoadScene("Home");
+                newScene.LoadScene("Home");
             }
-
         });
     }
-    public Task RegisterNewUser(string email, string password, string stNombreEtRe, string stCodigoEtRe)
+
+    private async void RegisterNewUser(string email, string password, string stNombreEtRe, string stCodigoEtRe)
     {
-        return auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWith(task =>
-        {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("CreateUserWithEmailAndPasswordAsync was canceled.");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
-                return;
-            }
-            user = task.Result;
-            user.SendEmailVerificationAsync().ContinueWith(task =>
+        SignOut();
+        retroalimentacionTxRe.GetComponent<UnityEngine.UI.Text>().text = "Registrandose";
+        string res = await auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWith(task =>
             {
                 if (task.IsCanceled)
                 {
-                    Debug.LogError("SendEmailVerificationAsync was canceled.");
-                    return;
+                    return "Error: Create User was canceled.";                    
                 }
                 if (task.IsFaulted)
                 {
-                    Debug.LogError("SendEmailVerificationAsync encountered an error: " + task.Exception);
-                    return;
+                    return "Error: " + task.Exception;                    
                 }
-
-                Debug.Log("xxxxxx Email sent successfully.");
-                OpenPanel(LoginPanel);
+                user = task.Result;
+                return "User created successfully";
             });
-        });
+
+        res += "\n" + await user.SendEmailVerificationAsync().ContinueWith(task =>
+                {
+                    if (task.IsCanceled)
+                    {
+                        return "Error: SendEmailVerification was canceled.";                        
+                    }
+                    if (task.IsFaulted)
+                    {
+                        return "Error: " + task.Exception;                        
+                    }
+                    return "Email sent successfully.\nVerify your email.";
+                });
+
+        retroalimentacionTxRe.GetComponent<UnityEngine.UI.Text>().text = res;
+        slider.value = 100.0f;
+        LoadingPanel.SetActive(false);
+        
+        //TODO: disabled inputs
+        correoEtRe.GetComponent<UnityEngine.UI.InputField>().interactable = false;
+        contrasenaEtRe.GetComponent<UnityEngine.UI.InputField>().interactable = false;
+        nombreEtRe.GetComponent<UnityEngine.UI.InputField>().interactable = false;
+        codigoEtRe.GetComponent<UnityEngine.UI.InputField>().interactable = false;
     }
 
     public void SignOut()
     {
         auth.SignOut();
         user = null;
-        CancelarReg();
     }
 
     public void resetPassword(string emailAddress)
@@ -253,22 +281,22 @@ public class Login : MonoBehaviour
         if (emailAddress.Trim() != "")
         {
             auth.SendPasswordResetEmailAsync(emailAddress).ContinueWith(task =>
-            {
-                if (task.IsCanceled)
                 {
-                    Debug.LogError("SendPasswordResetEmailAsync was canceled.");
-                    return;
-                }
-                if (task.IsFaulted)
-                {
-                    Debug.LogError("SendPasswordResetEmailAsync encountered an error: " + task.Exception);
-                    return;
-                }
+                    if (task.IsCanceled)
+                    {
+                        Debug.LogError("SendPasswordResetEmailAsync was canceled.");
+                        return;
+                    }
+                    if (task.IsFaulted)
+                    {
+                        Debug.LogError("SendPasswordResetEmailAsync encountered an error: " +
+                            task.Exception);
+                        return;
+                    }
 
-                Debug.Log("xxxxxxx Password reset email sent successfully.");
-                OpenPanel(LoginPanel);
-
-            });
+                    Debug.Log("xxxxxxx Password reset email sent successfully.");
+                    OpenPanel(LoginPanel);
+                });
         }
         else
         {
@@ -277,4 +305,3 @@ public class Login : MonoBehaviour
     }
 
 }
-

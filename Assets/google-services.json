@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "685352663862",
+    "project_id": "ar-position-u",
+    "storage_bucket": "ar-position-u.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:685352663862:android:2a1a096cc47437c4a05197",
+        "android_client_info": {
+          "package_name": "com.umayor.arpositionu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "685352663862-piv460uqk6uk215d0ncra01br3josmme.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2g4Um018ZTmmJQQZztXvcrCi3El7o0mA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "685352663862-piv460uqk6uk215d0ncra01br3josmme.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
