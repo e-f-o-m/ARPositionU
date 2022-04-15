@@ -12,15 +12,6 @@ mover a la ruta "/GooglePackages/
  * Falta Pasar los datos del usuario a la database de firebase (La contraseña no, sino el token)
  * Problemas con codigo asincrono: async await: no entra en newScene en login
  * Buscar que mas falta...
- * Cambiar de ventana al login y register
- * 
- * Los modelos de la base de datos de firebase: un modelo normal y un modelo full (posición)
- * 
- *_________ como parar un text a fecha (date) _________
- * ________ CRUD en firebase ________
- * ________ listar los datos en el scrollview ________
- * ________ Buscador: bucar en un array de modelos full el id (este modelo ya tiene la posición), find, filter, map foreach
- * tomar las fotos
  */
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -134,11 +125,11 @@ public class Login : MonoBehaviour
         slider.value = 40.0f;
         if (type == T_REGISTER)
         {
-            string stCorreoEtRe = correoEtRe.GetComponent<UnityEngine.UI.InputField>().text.Trim();
+            string stCorreoEtRe =
+                correoEtRe.GetComponent<UnityEngine.UI.InputField>().text.Trim();
             string stContrasenaEtRe = contrasenaEtRe.GetComponent<UnityEngine.UI.InputField>().text;
             string stNombreEtRe = nombreEtRe.GetComponent<UnityEngine.UI.InputField>().text;
             string stCodigoEtRe = codigoEtRe.GetComponent<UnityEngine.UI.InputField>().text;
-            
             if (stCorreoEtRe != "" && stContrasenaEtRe != "" && stNombreEtRe != "" && stCodigoEtRe != "")
             {
                 RegisterNewUser(stCorreoEtRe, stContrasenaEtRe, stNombreEtRe, stCodigoEtRe);
