@@ -16,60 +16,90 @@ using Firebase.Extensions;
 public class Home : MonoBehaviour
 {
     public GameObject HomePanel;
-    public GameObject AmbientesPanel;
+    public GameObject EventosPanel;
     public GameObject AdminPanel;
     public GameObject cardItem;
     public GameObject contentHorario;
-    [SerializeField] GameObject AceptarBtnH;
+    [Header ("Views Home")]
+    public GameObject AceptarBtnH;
+
+    [Header ("Dialog Select")]
+    public GameObject DialogoValiHo;
+    public GameObject DescripcionTvDiHo;
+
     private List<GameObject> horarios = new List<GameObject>();
 
     private List<Evento> eventos = new List<Evento>();
     private List<Lugar> lugares = new List<Lugar>();
 
-    string LUGARES_REF = "lugares";
-    string EVENTOS_REF = "eventos";
-    string HORARIO_REF = "horario";
-    string USUARIOS_REF = "usuarios";
-    string TOKEN_USER = "";
-    private Firebase.Auth.FirebaseUser user = null;
-    private Firebase.Auth.FirebaseAuth auth = null;
     private string eventKeySelected = null;
-    private DatabaseReference reference;
 
-
-    private int count = 0;
+    private FirebaseController fc;
     void Start()
     {
-        for (int i = 0; i < 2; i++)
-        {
-            horarios.Add(generateHorario());
-        }
+        iniciarDB();
     }
 
-    public GameObject generateHorario()
+    
+    private async void iniciarDB()
     {
-        count++;
-        GameObject g = (GameObject)Instantiate(cardItem, contentHorario.transform);
-        g.SetActive(true);
-        //TODO: change id, firebase database
-        g.transform.Find("marginPanel/id").GetComponent<Text>().text = ""+count;
-        return g;                   
+        fc = new FirebaseController();
+        await fc.CheckUser();
+        eventos = await fc.getMiHorario();
+        lugares = await fc.getLugares();
+        generateGaObEventos();
     }
 
-    public void setData(){
-        horarios.Add(generateHorario());
+    private void generateGaObEventos()
+    {
+        for (int i = 0; i < eventos.Count; i++)
+        {
+            var _evento = eventos[i];
+            GameObject g = (GameObject)Instantiate(cardItem, contentHorario.transform);
+            g.SetActive(true);
+            
+            g.transform.Find("marginPanel/id").GetComponent<Text>().text = ""+_evento.evento_key;
+
+            string _lugar = lugares.Find(x => x.lugar_key == _evento.lugar_key).nombre_lugar;
+            g.transform.Find("marginPanel/Salon").GetComponent<Text>().text = _lugar;
+            
+            g.transform.Find("marginPanel/Evento").GetComponent<Text>().text = _evento.nombre_evento;
+
+            Color selectedColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+            string [] days  = {"Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"};
+            string day = days[_evento.dia];
+            g.transform.Find("marginPanel/"+day).GetComponent<Text>().color = selectedColor;
+            horarios.Add(g);
+        }          
     }
 
-    public void selectItemHorario(GameObject id){
-        Debug.Log("Selected item: " + id.GetComponent<Text>().text);
+    public void selectItemHorario(GameObject id_event){
+        OpenPanelDialog(id_event.GetComponent<Text>().text);
+    }
+
+    public void OpenPanelDialog(string id_event){
+        eventKeySelected = id_event;
+        Boolean isOpen = DialogoValiHo.activeSelf;
+        DialogoValiHo.SetActive(!isOpen);
+        //DescripcionTvDiHo
     }
 
     public void OpenPanel(GameObject panel)
     {
+        //TODO: agregar estos dos
+        //panelAgregar.SetActive(false);
+        //panelListar.SetActive(false);
         HomePanel.SetActive(false);
-        AmbientesPanel.SetActive(false);
+        EventosPanel.SetActive(false);
         AdminPanel.SetActive(false);
         panel.SetActive(true);
     }
 
+
+    public void aceptarDialog(){
+        DialogoValiHo.SetActive(false);
+        MiHorario miHorario = new MiHorario();
+        miHorario.evento_key = eventKeySelected;
+        //TODO: DELETE: fc.deleteEvento(eventKeySelected);
+    }
 }
