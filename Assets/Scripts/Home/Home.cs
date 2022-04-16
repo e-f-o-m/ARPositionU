@@ -4,6 +4,9 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using Firebase;
+using Firebase.Database;
+using Firebase.Extensions;
 
 /* TODO:
  * Pasar el loading
@@ -19,6 +22,20 @@ public class Home : MonoBehaviour
     public GameObject contentHorario;
     [SerializeField] GameObject AceptarBtnH;
     private List<GameObject> horarios = new List<GameObject>();
+
+    private List<Evento> eventos = new List<Evento>();
+    private List<Lugar> lugares = new List<Lugar>();
+
+    string LUGARES_REF = "lugares";
+    string EVENTOS_REF = "eventos";
+    string HORARIO_REF = "horario";
+    string USUARIOS_REF = "usuarios";
+    string TOKEN_USER = "";
+    private Firebase.Auth.FirebaseUser user = null;
+    private Firebase.Auth.FirebaseAuth auth = null;
+    private string eventKeySelected = null;
+    private DatabaseReference reference;
+
 
     private int count = 0;
     void Start()

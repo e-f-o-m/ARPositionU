@@ -123,6 +123,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &11867029 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1939164819740022347, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+  m_PrefabInstance: {fileID: 332291745}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &35847795
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,7 +311,7 @@ GameObject:
   - component: {fileID: 144289296}
   - component: {fileID: 144289295}
   m_Layer: 5
-  m_Name: ViewsObjAmbientes
+  m_Name: ViewsObjEventos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -321,9 +326,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 144289294}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59cff5d43d8496b48b950e7c9dd4dc33, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b1f4720c6870ba4fac9ab8de3869b18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  contentAmbientes: {fileID: 295656478}
+  cardItem: {fileID: 824753402}
+  HomePanel: {fileID: 777906788}
+  AmbientesPanel: {fileID: 1143143940}
+  AdminPanel: {fileID: 1844014052}
+  BackBtnEv: {fileID: 827059950}
+  DialogoValiAmb: {fileID: 834764704}
+  DescripcionTvDiEv: {fileID: 967407797}
+  salon_id: {fileID: 0}
+  facultad: {fileID: 0}
+  nombre: {fileID: 0}
 --- !u!224 &144289296
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1102,13 +1118,93 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 295656479}
     m_Modifications:
+    - target: {fileID: 1939164819740022344, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 36.1981
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819740022344, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 184.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819740022344, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -50.312
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819740022345, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_Text
+      value: xxxxxx
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408540, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408540, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408542, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408542, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408542, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408542, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408542, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 285.3467
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408542, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 50.817
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408542, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 149.9984
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408542, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -31.908
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408543, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408543, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1939164819920408543, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
+      objectReference: {fileID: 144289295}
+    - target: {fileID: 1939164819920408543, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1939164819920408543, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: selectItemAmbientes
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408543, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Eventos, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164819920408543, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
+      value: 
+      objectReference: {fileID: 11867029}
+    - target: {fileID: 1939164819920408543, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 1939164820818725218, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_Pivot.x
@@ -1128,7 +1224,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1939164820818725218, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1939164820818725218, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_AnchorMin.x
@@ -1136,7 +1232,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1939164820818725218, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1939164820818725218, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_SizeDelta.x
@@ -1176,11 +1272,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1939164820818725218, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 158.45027
       objectReference: {fileID: 0}
     - target: {fileID: 1939164820818725218, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -35.27425
       objectReference: {fileID: 0}
     - target: {fileID: 1939164820818725218, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1197,6 +1293,14 @@ PrefabInstance:
     - target: {fileID: 1939164820818725221, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_Name
       value: CardPanel
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164820818725221, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939164821316729711, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
+      propertyPath: m_Text
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
@@ -1291,7 +1395,7 @@ GameObject:
   - component: {fileID: 413444838}
   - component: {fileID: 413444837}
   m_Layer: 5
-  m_Name: DescripcionTvDiAm
+  m_Name: DescripcionTvDiEv
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2417,7 +2521,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -6.600189, y: -5}
+  m_AnchoredPosition: {x: -6.6002045, y: -5}
   m_SizeDelta: {x: -51.9729, y: -151.2745}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &682797034
@@ -2977,7 +3081,7 @@ GameObject:
   - component: {fileID: 777324062}
   - component: {fileID: 777324061}
   m_Layer: 5
-  m_Name: ARCamBtn
+  m_Name: ARCamBtnEv
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3280,7 +3384,7 @@ GameObject:
   - component: {fileID: 827059953}
   - component: {fileID: 827059952}
   m_Layer: 5
-  m_Name: AceptarBtn
+  m_Name: BackBtnEv
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3400,12 +3504,12 @@ GameObject:
   - component: {fileID: 834764707}
   - component: {fileID: 834764706}
   m_Layer: 5
-  m_Name: DialogoValiAmb
+  m_Name: DialogoValiLu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &834764705
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4050,7 +4154,7 @@ GameObject:
   - component: {fileID: 967407800}
   - component: {fileID: 967407799}
   m_Layer: 5
-  m_Name: EditarBtnDiAm
+  m_Name: EditarBtnDiEv
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4976,7 +5080,6 @@ GameObject:
   - component: {fileID: 1143143941}
   - component: {fileID: 1143143943}
   - component: {fileID: 1143143942}
-  - component: {fileID: 1143143944}
   m_Layer: 5
   m_Name: Eventos
   m_TagString: Untagged
@@ -5046,27 +5149,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1143143940}
   m_CullTransparentMesh: 1
---- !u!114 &1143143944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1143143940}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b1f4720c6870ba4fac9ab8de3869b18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cardItem: {fileID: 824753402}
-  contentAmbientes: {fileID: 295656478}
-  HomePanel: {fileID: 0}
-  AmbientesPanel: {fileID: 0}
-  AdminPanel: {fileID: 0}
-  res: 
-  salon_id: {fileID: 0}
-  facultad: {fileID: 0}
-  nombre: {fileID: 0}
 --- !u!1 &1172866696
 GameObject:
   m_ObjectHideFlags: 0
@@ -6188,7 +6270,7 @@ GameObject:
   - component: {fileID: 1384343527}
   - component: {fileID: 1384343526}
   m_Layer: 5
-  m_Name: EliminarBtnDiAm
+  m_Name: CancelarBtnDiEv
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6257,7 +6339,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1384343527}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 144289295}
+        m_TargetAssemblyTypeName: Eventos, Assembly-CSharp
+        m_MethodName: OpenPanelDialog
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: '""'
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1384343527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7418,7 +7512,7 @@ GameObject:
   - component: {fileID: 1827020259}
   - component: {fileID: 1827020258}
   m_Layer: 5
-  m_Name: AcepatrBtnDiAm
+  m_Name: AcepatrBtnDiEv
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7488,13 +7582,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Login, Assembly-CSharp
-        m_MethodName: OpenPanel
-        m_Mode: 2
+      - m_Target: {fileID: 144289295}
+        m_TargetAssemblyTypeName: Eventos, Assembly-CSharp
+        m_MethodName: aceptarDialog
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -8141,7 +8235,7 @@ GameObject:
   - component: {fileID: 2115655021}
   - component: {fileID: 2115655020}
   m_Layer: 5
-  m_Name: TituloTvDiAm
+  m_Name: TituloTvDiEv
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8314,10 +8408,10 @@ PrefabInstance:
     - target: {fileID: 1939164819920408543, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 663854428}
     - target: {fileID: 1939164819920408543, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: selectItemHorario
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1939164820200158291, guid: 808d7ca2cb4b26a45852df932441e56e, type: 3}
       propertyPath: m_AnchoredPosition.x
