@@ -1,16 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
 
 public class ARCam : MonoBehaviour
 {
     public GameObject ARCamCanvas;
-    public GameObject HomeBtnAR;
-    private Myscenes.Scenes newScene = new Myscenes.Scenes();
+    private Boolean isLogged = false;
+
+
+    private FirebaseController fc;
+    void Start()
+    {
+        iniciarDB();
+    }
+
+    private async void iniciarDB()
+    {
+        fc = new FirebaseController();
+        isLogged = await fc.CheckUser();
+    }
 
     public void openScene()
     {
-        newScene.LoadScene("Login");
+        if (isLogged)
+        {
+            SceneManager.LoadScene("Home");
+        }
+        else
+        {
+            SceneManager.LoadScene("Login");
+        }
     }
 
     

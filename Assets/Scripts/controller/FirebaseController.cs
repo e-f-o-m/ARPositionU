@@ -8,7 +8,8 @@ using Firebase;
 using Firebase.Database;
 using Firebase.Extensions;
 
-public class FirebaseController {
+public class FirebaseController
+{
     string LUGARES_REF = "lugares";
     string EVENTOS_REF = "eventos";
     string HORARIO_REF = "horario";
@@ -20,18 +21,19 @@ public class FirebaseController {
     private DatabaseReference reference;
 
 
-    public FirebaseController() {
+    public FirebaseController()
+    {
         FirebaseDatabase db = FirebaseDatabase.GetInstance("https://ar-position-u-default-rtdb.firebaseio.com/");
         //Unity persistence firebase
         db.SetPersistenceEnabled(false);
         reference = db.RootReference;
-        reference.ValueChanged += HandleValueChanged;   
+        reference.ValueChanged += HandleValueChanged;
     }
 
 
-    public async Task CheckUser()
+    public async Task<Boolean> CheckUser()
     {
-        await Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+        return await Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
             {
                 var dependencyStatus = task.Result;
                 try
@@ -43,11 +45,19 @@ public class FirebaseController {
                         {
                             user = auth.CurrentUser;
                             TOKEN_USER = user.UserId;
-                            Debug.Log("User logged in");
+                            Boolean isVerifiedEmail = user.IsEmailVerified;
+                            if (isVerifiedEmail)
+                            {
+                                Debug.Log("User is verified");
+                                return true;
+                            }else{
+                                Debug.Log("User is not verified");
+                                return false;
+                            }
                         }
                         else
                         {
-                            Debug.Log("User not logged in");
+                            return false;
                         }
                     }
                 }
@@ -55,7 +65,7 @@ public class FirebaseController {
                 {
                     Debug.LogError(System.String.Format("Could not resolve all Firebase dependencies: {0}", dependencyStatus));
                 }
-                return;
+                return false;
 
             });
     }
@@ -74,14 +84,16 @@ public class FirebaseController {
 
     public async Task<string> addEvento(MiHorario miHorario)
     {
+        Debug.Log("Token: " + TOKEN_USER);
         var newRef = reference.Child(USUARIOS_REF).Child(TOKEN_USER).Child(HORARIO_REF);
         string ID = newRef.Push().Key;
         miHorario.horario_key = ID;
         string json = JsonUtility.ToJson(miHorario);
+        Debug.Log(json);
         return await newRef.Child(ID).SetRawJsonValueAsync(json).ContinueWith(task =>
         {
             if (task.IsCanceled)
-            { 
+            {
                 Debug.LogError("SetRawJsonValueAsync was canceled.");
                 return null;
             }
@@ -102,7 +114,7 @@ public class FirebaseController {
         {
             if (task.IsFaulted)
             {
-                Debug.Log("Error al recuperar datos de evento eventos: "+EVENTOS_REF);
+                Debug.Log("Error al recuperar datos de evento eventos: " + EVENTOS_REF);
             }
             else if (task.IsCompleted)
             {
@@ -120,11 +132,8 @@ public class FirebaseController {
 
     public async Task<List<Evento>> getMiHorario()
     {
-        Debug.Log("xxxxx Home a1");
         List<MiHorario> miHorarios = new List<MiHorario>();
         List<Evento> eventos = new List<Evento>();
-
-        Debug.Log("xxxxx ===== " + USUARIOS_REF + "/" + TOKEN_USER + "/" + HORARIO_REF);
         await reference.Child(USUARIOS_REF).Child(TOKEN_USER).Child(HORARIO_REF).GetValueAsync().ContinueWithOnMainThread(task =>
         {
             if (task.IsFaulted)
@@ -136,14 +145,12 @@ public class FirebaseController {
                 DataSnapshot snapshot = task.Result;
                 foreach (var item in snapshot.Children)
                 {
-                    Debug.Log("xxxxx Home a2=== "+item.GetRawJsonValue());
                     MiHorario miHorario = JsonUtility.FromJson<MiHorario>(item.GetRawJsonValue());
                     miHorarios.Add(miHorario);
                 }
             }
         });
 
-        Debug.Log("xxxxx Home a3");
 
         foreach (MiHorario miHorario in miHorarios)
         {
@@ -157,16 +164,16 @@ public class FirebaseController {
                 {
                     DataSnapshot snapshot = task.Result;
                     Evento evento = JsonUtility.FromJson<Evento>(snapshot.GetRawJsonValue());
+                    evento.evento_key = miHorario.horario_key;
                     eventos.Add(evento);
                 }
-                
+
             });
         }
-        Debug.Log("xxxxx Home a4");
         return eventos;
     }
 
-    
+
     public async Task<List<Lugar>> getLugares()
     {
         List<Lugar> lugares = new List<Lugar>();
@@ -175,7 +182,7 @@ public class FirebaseController {
         {
             if (task.IsFaulted)
             {
-                Debug.Log("Error al recuperar datos de lugar"+LUGARES_REF);
+                Debug.Log("Error al recuperar datos de lugar" + LUGARES_REF);
             }
             else if (task.IsCompleted)
             {
@@ -189,4 +196,202 @@ public class FirebaseController {
         });
         return lugares;
     }
+
+    public async Task<string> deleteHorario(string horario_key)
+    {
+        var newRef = reference.Child(USUARIOS_REF).Child(TOKEN_USER).Child(HORARIO_REF).Child(horario_key);
+        return await newRef.RemoveValueAsync().ContinueWith(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("RemoveValueAsync was canceled.");
+                return null;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("RemoveValueAsync encountered an error: " + task.Exception);
+                return null;
+            }
+            return horario_key;
+        });
+    }
+
+
+
+    public void logout()
+    {
+        Debug.Log("logout");
+        auth.SignOut();
+        user = null;
+    }
+
+    // ------------------------- LOGIN -------------------------
+
+    public async Task<string> resetPassword(string emailAddress)
+    {
+
+        return await auth.SendPasswordResetEmailAsync(emailAddress).ContinueWith(task =>
+            {
+                if (task.IsCanceled)
+                {
+                    Debug.LogError("SendPasswordResetEmailAsync was canceled.");
+                    return null;
+                }
+                if (task.IsFaulted)
+                {
+                    Debug.LogError("SendPasswordResetEmailAsync encountered an error: " +
+                        task.Exception);
+                    return null;
+                }
+
+                return "Password reset email sent successfully.";
+
+            });
+    }
+
+
+    public async Task<Boolean> SingIn(string email, string password)
+    {
+        return await auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWith(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("SignInWithEmailAndPasswordAsync was canceled.");
+                return false;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
+                return false;
+            }
+            user = task.Result;
+            Boolean isVerifiedEmail = user.IsEmailVerified;
+            if (isVerifiedEmail)
+            {
+                Debug.Log("Email is verified");
+                return true;
+            }
+            else
+            {
+                Debug.Log("Email is not verified");
+                return false;
+            }
+        });
+    }
+
+
+    public async Task<string> registerNewUser(string email, string password, string stNombreEtRe, string stCodigoEtRe)
+    {
+        logout();
+        string res = await auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWith(task =>
+            {
+                if (task.IsCanceled)
+                {
+                    return null;
+                }
+                if (task.IsFaulted)
+                {
+                    return null;
+                }
+                user = task.Result;
+                return "Nuevo Usuario";
+            });
+
+        res = await user.SendEmailVerificationAsync().ContinueWith(task =>
+            {
+                if (task.IsCanceled)
+                {
+                    return null;
+                }
+                if (task.IsFaulted)
+                {
+                    return null;
+                }
+                return res + "\nCorreo valido.\nVerifique la cuenta en su correo.";
+            });
+
+        if (res != null)
+        {
+            Usuario usuario = new Usuario();
+            usuario.correo = email;
+            usuario.nombre = stNombreEtRe;
+            usuario.codigo = stCodigoEtRe;
+            usuario.rol = "estudiante";
+            usuario.usuario_key = user.UserId;
+
+            Debug.Log("usuario_key: " + usuario.usuario_key);
+            res = await reference.Child(USUARIOS_REF).Child(user.UserId).SetRawJsonValueAsync(JsonUtility.ToJson(usuario)).ContinueWith(task =>
+            {
+                if (task.IsCanceled)
+                {
+                    Debug.LogError("SetRawJsonValueAsync was canceled.");
+                    return null;
+                }
+                if (task.IsFaulted)
+                {
+                    Debug.LogError("SetRawJsonValueAsync Registrarse: " + task.Exception);
+                    return null;
+                }
+                return res + "\n⏳";
+            });
+        }
+        if (res == null)
+        {
+            logout();
+        }
+        return res;
+
+    }
+
+    public async Task<Boolean> deleteUser(){
+        await reference.Child(USUARIOS_REF).Child(user.UserId).RemoveValueAsync().ContinueWith(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("RemoveValueAsync was canceled.");
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("RemoveValueAsync encountered an error: " + task.Exception);
+            }
+        });
+
+
+        return await user.DeleteAsync().ContinueWith(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("DeleteAsync was canceled.");
+                return false;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("DeleteAsync encountered an error: " + task.Exception);
+                return false;
+            }
+            return true;
+        });
+    }
+
+
+    // ------------------------- USER
+    public async Task<Usuario> getUserData()
+    {
+        Usuario usuario = new Usuario();
+        await reference.Child(USUARIOS_REF).Child(TOKEN_USER).GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Debug.Log("Error al recuperar datos de usuario");
+            }
+            else if (task.IsCompleted)
+            {
+                DataSnapshot snapshot = task.Result;
+                usuario = JsonUtility.FromJson<Usuario>(snapshot.GetRawJsonValue());
+            }
+        });
+        return usuario;
+    }
+
+
 }

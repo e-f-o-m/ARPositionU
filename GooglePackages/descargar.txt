@@ -1,0 +1,6 @@
+com.google.external-dependency-manager-1.2.170.tgz
+com.google.firebase.app-8.9.0.tgz
+com.google.firebase.auth-8.9.0.tgz
+com.google.firebase.database-8.9.0.tgz
+
+json para android va en Assets

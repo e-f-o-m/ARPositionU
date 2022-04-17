@@ -4,9 +4,6 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using Firebase;
-using Firebase.Database;
-using Firebase.Extensions;
 
 /* TODO:
  * Pasar el loading
@@ -20,6 +17,7 @@ public class Home : MonoBehaviour
     public GameObject AdminPanel;
     public GameObject cardItem;
     public GameObject contentHorario;
+    public ScrollRect scrollRect;
     [Header ("Views Home")]
     public GameObject AceptarBtnH;
 
@@ -32,19 +30,31 @@ public class Home : MonoBehaviour
     private List<Evento> eventos = new List<Evento>();
     private List<Lugar> lugares = new List<Lugar>();
 
+    private Boolean isLogged = false;
     private string eventKeySelected = null;
+
 
     private FirebaseController fc;
     void Start()
     {
+    }
+    void OnEnable()
+    {
+        horarios = horarios = new List<GameObject>();
         iniciarDB();
     }
 
+    void OnDisable()
+    {
+        for(int i=0; i<horarios.Count; i++) {
+            Destroy(horarios[i].gameObject);
+        }
+    }
     
     private async void iniciarDB()
     {
         fc = new FirebaseController();
-        await fc.CheckUser();
+        isLogged = await fc.CheckUser();
         eventos = await fc.getMiHorario();
         lugares = await fc.getLugares();
         generateGaObEventos();
@@ -83,6 +93,7 @@ public class Home : MonoBehaviour
         DialogoValiHo.SetActive(!isOpen);
         //DescripcionTvDiHo
     }
+    
 
     public void OpenPanel(GameObject panel)
     {
@@ -98,8 +109,21 @@ public class Home : MonoBehaviour
 
     public void aceptarDialog(){
         DialogoValiHo.SetActive(false);
-        MiHorario miHorario = new MiHorario();
-        miHorario.evento_key = eventKeySelected;
-        //TODO: DELETE: fc.deleteEvento(eventKeySelected);
+        deleteHorario(eventKeySelected);
+    }
+
+    private async Task deleteHorario(string key_horario){
+        string res = await fc.deleteHorario(key_horario);
+        if(res != null){
+            Debug.Log("Evento eliminado res :"+res);
+            for(int i=0; i<horarios.Count; i++){
+                if(horarios[i].transform.Find("marginPanel/id").GetComponent<Text>().text == key_horario){
+                    Destroy(horarios[i].gameObject);
+                    horarios.RemoveAt(i);
+                    break;
+                }
+            }
+
+        }
     }
 }

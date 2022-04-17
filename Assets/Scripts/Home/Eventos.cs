@@ -89,10 +89,10 @@ public class Eventos : MonoBehaviour
 
 
     public void aceptarDialog(){
-        DialogoValiEv.SetActive(false);
         MiHorario miHorario = new MiHorario();
         miHorario.evento_key = eventKeySelected;
         fc.addEvento(miHorario);
+        DialogoValiEv.SetActive(false);
     }
 
 }
