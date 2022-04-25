@@ -82,9 +82,8 @@ public class FirebaseController
 
 
 
-    public async Task<string> addEvento(MiHorario miHorario)
+    public async Task<string> addHorario(MiHorario miHorario)
     {
-        Debug.Log("Token: " + TOKEN_USER);
         var newRef = reference.Child(USUARIOS_REF).Child(TOKEN_USER).Child(HORARIO_REF);
         string ID = newRef.Push().Key;
         miHorario.horario_key = ID;
@@ -127,6 +126,29 @@ public class FirebaseController
             }
         });
         return eventos;
+    }
+
+    public async Task<string> addEvento(Evento _evento)
+    {
+        var newRef = reference.Child(EVENTOS_REF);
+        string ID = newRef.Push().Key;
+        _evento.evento_key = ID;
+        string json = JsonUtility.ToJson(_evento);
+        Debug.Log(json);
+        return await newRef.Child(ID).SetRawJsonValueAsync(json).ContinueWith(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("SetRawJsonValueAsync was canceled.");
+                return null;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("SetRawJsonValueAsync encountered an error: " + task.Exception);
+                return null;
+            }
+            return ID;
+        });    
     }
 
 
