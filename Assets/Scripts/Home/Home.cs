@@ -4,6 +4,7 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 /* TODO:
  * Pasar el loading
@@ -12,9 +13,15 @@ using UnityEngine.UI;
  */
 public class Home : MonoBehaviour
 {
-    public GameObject HomePanel;
+
+    [Header("Panels")]
+    public GameObject MiHorarioPanel;
     public GameObject EventosPanel;
-    public GameObject AdminPanel;
+    public GameObject AjustesPanel;
+    public GameObject AdminRootPanel;
+
+
+    [Header("Cards")]
     public GameObject cardItem;
     public GameObject contentHorario;
     public ScrollRect scrollRect;
@@ -33,11 +40,7 @@ public class Home : MonoBehaviour
     private Boolean isLogged = false;
     private string eventKeySelected = null;
 
-
     private FirebaseController fc;
-    void Start()
-    {
-    }
     void OnEnable()
     {
         horarios = horarios = new List<GameObject>();
@@ -93,25 +96,36 @@ public class Home : MonoBehaviour
         DialogoValiHo.SetActive(!isOpen);
         //DescripcionTvDiHo
     }
-    
 
-    public void OpenPanel(GameObject panel)
+    public void openARCam()
     {
-        //TODO: agregar estos dos
-        //panelAgregar.SetActive(false);
-        //panelListar.SetActive(false);
-        HomePanel.SetActive(false);
-        EventosPanel.SetActive(false);
-        AdminPanel.SetActive(false);
-        panel.SetActive(true);
+        SceneManager.LoadScene("ARCam");
+        MiHorarioPanel.SetActive(false);
     }
-
+    public void openEventos()
+    {
+        EventosPanel.SetActive(true);
+        MiHorarioPanel.SetActive(false);
+    }
+    public void openAdmin()
+    {
+        PlayerPrefs.SetString("backPress", "MiHorario AdminPrincipal");
+        PlayerPrefs.Save();
+        AdminRootPanel.SetActive(true);
+        MiHorarioPanel.SetActive(false);
+    }
+    
+    public void openAjustes()
+    {
+        AjustesPanel.SetActive(true);
+        MiHorarioPanel.SetActive(false);
+    }
 
     public void aceptarDialog(){
         DialogoValiHo.SetActive(false);
         deleteHorario(eventKeySelected);
     }
-
+    
     private async Task deleteHorario(string key_horario){
         string res = await fc.deleteHorario(key_horario);
         if(res != null){

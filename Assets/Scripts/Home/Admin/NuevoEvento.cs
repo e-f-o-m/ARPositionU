@@ -10,13 +10,15 @@ using Firebase.Extensions;
 
 public class NuevoEvento : MonoBehaviour
 {
+    [Header("Panels Admin")]
+    public GameObject AdminPrincipalPanel;
+    public GameObject AdminRootPanel;
+    public GameObject EventosPanel;
+    public GameObject NuevoEventoPanel;
 
-    [Header("Panel")]
-    public GameObject AdminPanel;
-    public GameObject NuevoEventosPanel;
     public GameObject TimePickerPanel;
-    
-    [Header ("Form")]
+
+    [Header("Form")]
     public Dropdown DropdownLugarNE;
     public GameObject NombreEventoNE;
     public GameObject ResponsableNE;
@@ -35,8 +37,6 @@ public class NuevoEvento : MonoBehaviour
     [Header("Time Picker")]
     public GameObject amBtn;
     public GameObject pmBtn;
-    
-
     // Aceptar y Cancelar
 
 
@@ -46,7 +46,6 @@ public class NuevoEvento : MonoBehaviour
 
     private List<Evento> eventos = new List<Evento>();
     private List<Lugar> lugares = new List<Lugar>();
-    private Boolean isAm = true;
     private Boolean isInicio = true;
 
 
@@ -55,8 +54,11 @@ public class NuevoEvento : MonoBehaviour
     private FirebaseController fc;
     private Evento evento = new Evento();
 
-    void Start()
+    // get data firebase
+    // set data vies
+    void OnEnable()
     {
+        var test = PlayerPrefs.GetString("eventKeySelected", "");
         generateTimePicker();
         iniciarDB();
     }
@@ -66,12 +68,10 @@ public class NuevoEvento : MonoBehaviour
         evento.lugar_key = lugares[value].lugar_key;
     }
 
-
     private async void iniciarDB()
     {
         fc = new FirebaseController();
         await fc.CheckUser();
-        eventos = await fc.getEventos();
         lugares = await fc.getLugares();
 
         DropdownLugarNE.ClearOptions();
@@ -81,18 +81,38 @@ public class NuevoEvento : MonoBehaviour
         {
             DropdownLugarNE.AddOptions(new List<string>() { lugares[i].nombre_lugar });
         }
-        
+
         DropdownLugarNE.onValueChanged.AddListener(OnFirstDropdownValueChange);
+
+
+        //set data views
+        string evento_key = PlayerPrefs.GetString("eventKeySelected", "");
+        if (evento_key != "")
+        {
+            evento = await fc.getEvento(evento_key);
+
+            //select dropdown
+            DropdownLugarNE.value = lugares.FindIndex(x => x.lugar_key == evento.lugar_key);
+
+            NombreEventoNE.GetComponent<InputField>().text = evento.nombre_evento;
+            ResponsableNE.GetComponent<InputField>().text = evento.responsable;
+            DescripcionNE.GetComponent<InputField>().text = evento.descripcion;
+
+            InicioBtn.GetComponentInChildren<Text>().text = evento.hora_inicio;
+            FinBtn.GetComponentInChildren<Text>().text = evento.hora_fin;
+            SelectDay(evento.dia);
+        }
     }
 
     public void generateTimePicker()
     {
         //TimePicker.SetActive(false);
-        for (int i = 0; i < 24; i++)
+        for (int i = 7; i < 24; i++)
         {
             hours.Add(i);
-            minutes.Add(i);
+            minutes.Add(i-7);
         }
+        hours.Add(0);hours.Add(1);hours.Add(2);hours.Add(3);hours.Add(4);hours.Add(5);hours.Add(6);
         for (int i = 24; i < 60; i++)
         {
             minutes.Add(i);
@@ -122,12 +142,11 @@ public class NuevoEvento : MonoBehaviour
         //set color
         contentDias.transform.GetChild(day).GetComponent<Image>().color = Color.yellow;
         //set Day
-        evento.dia = day+1;
+        evento.dia = day + 1;
     }
 
     public void OpenPanel(GameObject panel)
     {
-        NuevoEventosPanel.SetActive(false);
         panel.SetActive(true);
     }
 
@@ -140,44 +159,24 @@ public class NuevoEvento : MonoBehaviour
     public void AceptarTimePicker()
     {
         TimePickerPanel.SetActive(false);
-        string stAm = " a. m.";
-        if(!isAm)
-        {
-            stAm = " p. m.";
-        }
-        
+
         TimeSpan span = TimeSpan.FromHours(16);
 
         if (isInicio)
         {
-            evento.hora_inicio = eventHourSelected + ":" + eventMinutSelected + stAm;
+            evento.hora_inicio = eventHourSelected + ":" + eventMinutSelected;
             System.DateTime dateTime = System.DateTime.Parse(evento.hora_inicio);
             evento.hora_inicio = dateTime.ToString("hh:mm tt");
-            
+
             InicioBtn.GetComponentInChildren<Text>().text = evento.hora_inicio;
         }
         else
         {
-            evento.hora_fin = eventHourSelected + ":" + eventMinutSelected + stAm;
+            evento.hora_fin = eventHourSelected + ":" + eventMinutSelected;
             System.DateTime dateTime = System.DateTime.Parse(evento.hora_fin);
             evento.hora_fin = dateTime.ToString("hh:mm tt");
             FinBtn.GetComponentInChildren<Text>().text = evento.hora_fin;
 
-        }
-    }
-
-    public void SetIsAm(Boolean isAm)
-    {
-        this.isAm = isAm;
-        if (isAm)
-        {
-            amBtn.GetComponent<Image>().color = Color.blue;
-            pmBtn.GetComponent<Image>().color = Color.white;
-        }
-        else
-        {
-            amBtn.GetComponent<Image>().color = Color.white;
-            pmBtn.GetComponent<Image>().color = Color.blue;
         }
     }
 
@@ -206,45 +205,57 @@ public class NuevoEvento : MonoBehaviour
         eventMinutSelected = Int32.Parse(minut.transform.GetComponent<Text>().text);
     }
 
-    public void AceptarBtn(){
+    public void AceptarBtn()
+    {
         evento.nombre_evento = NombreEventoNE.GetComponent<UnityEngine.UI.InputField>().text;
         evento.descripcion = DescripcionNE.GetComponent<UnityEngine.UI.InputField>().text;
-        if(evento.nombre_evento.Trim() != "" ){
-            Debug.Log("nombre_e");
-        }
-        if(evento.lugar_key.Trim() != "" ){
-            Debug.Log("lugar_ke");
-        }
-        if(evento.hora_inicio.Trim() != "" ){
-            Debug.Log("hora_ini");
-        }
-        if(evento.hora_fin.Trim() != "" ){
-            Debug.Log("hora_fin");
-        }
-        if(evento.dia != 0 ){
-            Debug.Log("dia != 0");
-        }
-        if(evento.hora_inicio != evento.hora_fin){
-            Debug.Log("hora_ini");
-        }
-        
+        evento.responsable = ResponsableNE.GetComponent<UnityEngine.UI.InputField>().text;
 
-        if (evento.nombre_evento.Trim() != "" 
-            && evento.lugar_key.Trim() != "" 
-        && evento.hora_inicio.Trim() != "" 
-        && evento.hora_fin.Trim() != "" 
-        && evento.dia != 0 
-        && evento.hora_inicio != evento.hora_fin)
+        if (evento.nombre_evento.Trim() != ""
+            && evento.lugar_key.Trim() != ""
+            && evento.hora_inicio.Trim() != ""
+            && evento.hora_fin.Trim() != ""
+            && evento.dia != 0
+            && evento.hora_inicio != evento.hora_fin)
         {
-            //print all evento 
-            print("evento key: " + evento.evento_key + " nombre evento: " + evento.nombre_evento + " descripcion: " + evento.descripcion + " lugar key: " + evento.lugar_key + " hora inicio: " + evento.hora_inicio + " hora fin: " + evento.hora_fin + " dia: " + evento.dia);
-
-            //fc.addEvento(miHorario);
+            evento.version = 1; 
+            
+            setDataFirebase();
         }
         else
         {
             RetroalimentacionNE.GetComponent<Text>().text = "Faltan campos por llenar";
         }
+    }
+
+    private async void setDataFirebase()
+    {
+        string backPress = PlayerPrefs.GetString("backPress", "");
+        if (backPress == "Eventos NuevoEvento" || backPress == "AdminPrincipal NuevoEvento"){    
+            await fc.addEvento(evento);
+            onBackPressed();
+        } else {
+            await fc.updateEvento(evento);
+            onBackPressed();
+        }
+    }
+
+
+    public void CancelarBtn()
+    {
+        onBackPressed();
+    }
+
+    public void onBackPressed()
+    {
+        string backPress = PlayerPrefs.GetString("backPress", "");
+        if (backPress == "Eventos NuevoEvento" || backPress == "Eventos EditarEvento"){
+            EventosPanel.SetActive(true);
+            AdminRootPanel.SetActive(false);
+        }else {
+            AdminPrincipalPanel.SetActive(true);
+        }
+        NuevoEventoPanel.SetActive(false);
     }
 
 }

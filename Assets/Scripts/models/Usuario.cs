@@ -6,11 +6,11 @@ public class Usuario
     public string nombre;
     public string correo;
     public string codigo;
-    public string rol;
+    public int rol;
 
     public Usuario(){}
     
-    public Usuario(string usuario_key, string nombre, string correo, string codigo, string rol)
+    public Usuario(string usuario_key, string nombre, string correo, string codigo, int rol)
     {
         this.usuario_key = usuario_key;
         this.nombre = nombre;

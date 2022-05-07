@@ -30,7 +30,6 @@ public class FirebaseController
         reference.ValueChanged += HandleValueChanged;
     }
 
-
     public async Task<Boolean> CheckUser()
     {
         return await Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
@@ -80,8 +79,6 @@ public class FirebaseController
         Debug.Log(args.Snapshot);
     }
 
-
-
     public async Task<string> addHorario(MiHorario miHorario)
     {
         var newRef = reference.Child(USUARIOS_REF).Child(TOKEN_USER).Child(HORARIO_REF);
@@ -128,6 +125,24 @@ public class FirebaseController
         return eventos;
     }
 
+    public async Task<Evento> getEvento(string evento_key)
+    {
+        Evento evento = new Evento();
+        await reference.Child(EVENTOS_REF).Child(evento_key).GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Debug.Log("Error al recuperar datos de evento eventos: " + EVENTOS_REF);
+            }
+            else if (task.IsCompleted)
+            {
+                DataSnapshot snapshot = task.Result;
+                evento = JsonUtility.FromJson<Evento>(snapshot.GetRawJsonValue());
+            }
+        });
+        return evento;
+    }
+
     public async Task<string> addEvento(Evento _evento)
     {
         var newRef = reference.Child(EVENTOS_REF);
@@ -149,6 +164,26 @@ public class FirebaseController
             }
             return ID;
         });    
+    }
+
+    public async Task<String> updateEvento(Evento _evento)
+    {
+        string json = JsonUtility.ToJson(_evento);
+        Debug.Log(json);
+        return await reference.Child(EVENTOS_REF).Child(_evento.evento_key).SetRawJsonValueAsync(json).ContinueWith(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("SetRawJsonValueAsync was canceled.");
+                return null;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("SetRawJsonValueAsync encountered an error: " + task.Exception);
+                return null;
+            }
+            return _evento.evento_key;
+        });
     }
 
 
@@ -240,14 +275,13 @@ public class FirebaseController
 
 
 
+    // ------------------------- LOGIN -------------------------
     public void logout()
     {
         Debug.Log("logout");
         auth.SignOut();
         user = null;
     }
-
-    // ------------------------- LOGIN -------------------------
 
     public async Task<string> resetPassword(string emailAddress)
     {
@@ -338,7 +372,7 @@ public class FirebaseController
             usuario.correo = email;
             usuario.nombre = stNombreEtRe;
             usuario.codigo = stCodigoEtRe;
-            usuario.rol = "estudiante";
+            usuario.rol = 0;
             usuario.usuario_key = user.UserId;
 
             Debug.Log("usuario_key: " + usuario.usuario_key);
@@ -396,7 +430,29 @@ public class FirebaseController
     }
 
 
-    // ------------------------- USER
+    // ------------------------- Users -------------------------
+    public async Task<List<Usuario>> getUsuarios()
+    {
+        List<Usuario> usuarios = new List<Usuario>();
+        await reference.Child(USUARIOS_REF).GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Debug.Log("Error al recuperar datos de usuarios");
+            }
+            else if (task.IsCompleted)
+            {
+                DataSnapshot snapshot = task.Result;
+                foreach (var item in snapshot.Children)
+                {
+                    Usuario usuario = JsonUtility.FromJson<Usuario>(item.GetRawJsonValue());
+                    usuarios.Add(usuario);
+                }
+            }
+        });
+        return usuarios;
+    }
+
     public async Task<Usuario> getUserData()
     {
         Usuario usuario = new Usuario();
@@ -413,6 +469,25 @@ public class FirebaseController
             }
         });
         return usuario;
+    }
+
+    public async Task<Boolean> updateUsuario(Usuario usuario)
+    {
+        await reference.Child(USUARIOS_REF).Child(usuario.usuario_key).SetRawJsonValueAsync(JsonUtility.ToJson(usuario)).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("SetRawJsonValueAsync was canceled.");
+                return false;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("SetRawJsonValueAsync encountered an error: " + task.Exception);
+                return false;
+            }
+            return true;
+        });
+        return true;
     }
 
 

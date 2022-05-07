@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Myscenes;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -49,10 +48,11 @@ public class Login : MonoBehaviour
     private int T_REGISTER = 1;
 
     private int T_RECUPERAR = 2;
+    private LoginScenes scenes;
     private FirebaseController fc;
+
     private Boolean isLogged = false;
 
-    private Myscenes.Scenes newScene = new Myscenes.Scenes();
 
     void Start()
     {
@@ -64,12 +64,13 @@ public class Login : MonoBehaviour
     private async void iniciarDB()
     {
         slider.value = 40.0f;
+        scenes = new LoginScenes();
         fc = new FirebaseController();
         isLogged = await fc.CheckUser();
         slider.value = 100.0f;
         if (isLogged)
         {
-            newScene.LoadScene("Home");
+            scenes.LoadScene("Home");
         }
         LoadingPanel.SetActive(false);
     }
@@ -117,7 +118,7 @@ public class Login : MonoBehaviour
                 Boolean bo = await fc.SingIn(stCorreoEtLo, stContrasenaEtLo);
                 if (bo)
                 {
-                    newScene.LoadScene("Home");
+                    scenes.LoadScene("Home");
                 }else{
                     RetroalimentacionTxLo.GetComponent<Text>().text = "Usuario o contraseña incorrectos";
                 }
@@ -170,7 +171,7 @@ public class Login : MonoBehaviour
 
     public void CancelarReg()
     {
-        newScene.LoadScene("ARCam");
+        scenes.LoadScene("ARCam");
     }
 
     public void OpenPanel(GameObject panel)

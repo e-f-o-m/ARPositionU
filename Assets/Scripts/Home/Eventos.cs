@@ -10,12 +10,17 @@ using Firebase.Extensions;
 
 public class Eventos : MonoBehaviour
 {
+    [Header("Panels Admin")]
+    public GameObject MiHorarioPanel;
+    public GameObject AdminPanelRoot;
+    public GameObject EventosPanel;
+    [Header("Cards")]
     public GameObject contentAmbientes;
     public GameObject cardItem;
-    public GameObject HomePanel;
-    public GameObject EventosPanel;
-    public GameObject AdminPanel;
     public GameObject BackBtnEv;
+
+    [Header("search")]
+    public GameObject SearchEtEv;
     
     [Header ("Dialog Select")]
     public GameObject DialogoValiEv;
@@ -29,9 +34,18 @@ public class Eventos : MonoBehaviour
     private string eventKeySelected = null;
     private FirebaseController fc;
 
+    //private HomeScenes scenes = new HomeScenes();
+
     void Start()
     {
         iniciarDB();
+    }
+
+    void OnDisable()
+    {
+        for(int i=0; i<horarios.Count; i++) {
+            Destroy(horarios[i].gameObject);
+        }
     }
 
     private async void iniciarDB()
@@ -74,25 +88,67 @@ public class Eventos : MonoBehaviour
         eventKeySelected = id_event;
         Boolean isOpen = DialogoValiEv.activeSelf;
         DialogoValiEv.SetActive(!isOpen);
+        PlayerPrefs.SetString("eventKeySelected", eventKeySelected);
+        PlayerPrefs.SetString("backPress", "Eventos");
+        PlayerPrefs.Save();
     }
-
-    public void OpenPanel(GameObject panel)
-    {
-        //TODO: agregar
-        //panelAgregar.SetActive(false);
-        //panelListar.SetActive(false);
-        HomePanel.SetActive(false);
-        EventosPanel.SetActive(false);
-        AdminPanel.SetActive(false);
-        panel.SetActive(true);
-    }
-
 
     public void aceptarDialog(){
         MiHorario miHorario = new MiHorario();
         miHorario.evento_key = eventKeySelected;
-        //fc.addEvento(miHorario);
+        fc.addHorario(miHorario);
         DialogoValiEv.SetActive(false);
+    }
+
+    public void OpenNewEvent()
+    {
+        PlayerPrefs.SetString("eventKeySelected", "");
+        PlayerPrefs.SetString("backPress", "Eventos NuevoEvento");
+        PlayerPrefs.Save();
+        AdminPanelRoot.SetActive(true);
+        EventosPanel.SetActive(false);
+    }
+
+    public void OpenEditEvent()
+    {
+        PlayerPrefs.SetString("eventKeySelected", eventKeySelected);
+        PlayerPrefs.SetString("backPress", "Eventos EditarEvento");
+        PlayerPrefs.Save();
+        AdminPanelRoot.SetActive(true);
+        EventosPanel.SetActive(false);
+    }
+
+    public void filtrarEventos()
+    {
+        string _search = SearchEtEv.GetComponent<InputField>().text;
+        if (_search.Length > 0)
+        {
+            for (int i = 0; i < horarios.Count; i++)
+            {
+                if (horarios[i].transform.Find("marginPanel/Evento").GetComponent<Text>().text.Contains(_search)
+                || horarios[i].transform.Find("marginPanel/Salon").GetComponent<Text>().text.Contains(_search))
+                {
+                    horarios[i].SetActive(true);
+                }
+                else
+                {
+                    horarios[i].SetActive(false);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < horarios.Count; i++)
+            {
+                horarios[i].SetActive(true);
+            }
+        }
+    }
+
+    public void BackPress()
+    {
+        MiHorarioPanel.SetActive(true);
+        EventosPanel.SetActive(false);
     }
 
 }

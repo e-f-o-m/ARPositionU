@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 66c12f776b074ad40a28cbeba2b547b4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - NuevoEventoPanel: {instanceID: 0}
+  - AdminPrincipal: {instanceID: 0}
+  - UsuriosPanel: {instanceID: 0}
+  - AdminPanelRoot: {instanceID: 0}
+  - MiHorarioPanel: {instanceID: 0}
+  - EventosPanel: {instanceID: 0}
+  - AjustesPanel: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
