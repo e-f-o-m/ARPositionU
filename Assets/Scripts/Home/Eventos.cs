@@ -36,7 +36,7 @@ public class Eventos : MonoBehaviour
 
     //private HomeScenes scenes = new HomeScenes();
 
-    void Start()
+    void OnEnable()
     {
         iniciarDB();
     }
@@ -46,6 +46,7 @@ public class Eventos : MonoBehaviour
         for(int i=0; i<horarios.Count; i++) {
             Destroy(horarios[i].gameObject);
         }
+        
     }
 
     private async void iniciarDB()
