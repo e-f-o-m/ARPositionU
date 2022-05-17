@@ -41,9 +41,9 @@ public class Home : MonoBehaviour
     private string eventKeySelected = null;
 
     private FirebaseController fc;
-    
     void OnEnable()
     {
+        horarios = horarios = new List<GameObject>();
         iniciarDB();
     }
 

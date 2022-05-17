@@ -72,10 +72,6 @@ public class Login : MonoBehaviour
         {
             scenes.LoadScene("Home");
         }
-        else
-        {
-            OpenPanel(LoginPanel);
-        }
         LoadingPanel.SetActive(false);
     }
 

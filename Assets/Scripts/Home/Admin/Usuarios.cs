@@ -109,7 +109,7 @@ public class Usuarios : MonoBehaviour
 
     public async void setDataFirebase(Usuario usuario)
     {
-        Boolean b = await fc.updateRolUser(usuario);
+        Boolean b = await fc.updateUsuario(usuario);
         closetDialogRole();
     }
 
@@ -123,16 +123,6 @@ public class Usuarios : MonoBehaviour
         usuarioKeySelected = usuario_key.GetComponent<Text>().text;
         usuario = usuarios.Find(x => x.usuario_key == usuarioKeySelected);
         DialogoUser.SetActive(true);
-        changeToggle(usuario.rol);
-        optionRol = usuario.rol;
-        if (usuario.rol == 0) {
-            TgEstudiante.GetComponent<Toggle>().isOn = true;
-        }else if(usuario.rol == 1) {
-            TgAdmin.GetComponent<Toggle>().isOn = true;
-        }else {   
-            TgSAdmin.GetComponent<Toggle>().isOn = true;
-        }
-        
     }
 
     

@@ -471,9 +471,9 @@ public class FirebaseController
         return usuario;
     }
 
-    public async Task<Boolean> updateRolUser(Usuario usuario)
+    public async Task<Boolean> updateUsuario(Usuario usuario)
     {
-        await reference.Child(USUARIOS_REF).Child(usuario.usuario_key).Child("rol").SetValueAsync(usuario.rol).ContinueWith(task =>
+        await reference.Child(USUARIOS_REF).Child(usuario.usuario_key).SetRawJsonValueAsync(JsonUtility.ToJson(usuario)).ContinueWithOnMainThread(task =>
         {
             if (task.IsCanceled)
             {
@@ -488,40 +488,6 @@ public class FirebaseController
             return true;
         });
         return true;
-    }
-
-    public async Task<Boolean> updateNameCodeUser(Usuario usuario)
-    {
-        var res = await reference.Child(USUARIOS_REF).Child(usuario.usuario_key).Child("nombre").SetValueAsync(usuario.nombre).ContinueWith(task =>
-        {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("SetRawJsonValueAsync was canceled.");
-                return false;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("SetRawJsonValueAsync encountered an error: " + task.Exception);
-                return false;
-            }
-            return true;
-        });
-        res = await reference.Child(USUARIOS_REF).Child(usuario.usuario_key).Child("codigo").SetValueAsync(usuario.codigo).ContinueWith(task =>
-        {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("SetRawJsonValueAsync was canceled.");
-                return false;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("SetRawJsonValueAsync encountered an error: " + task.Exception);
-                return false;
-            }
-            return true;
-        });
-        
-        return res;
     }
 
 
