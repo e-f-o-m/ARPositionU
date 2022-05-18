@@ -75,3 +75,8 @@ ehthumbs.db
 [Ee]xported[Oo]bj/
 
 *.stackdump
+
+
+com.ptc.vuforia.engine-10.7.2.tgz
+
+./Packages/*.tgz

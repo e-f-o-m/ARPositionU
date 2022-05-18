@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 public class ARCam : MonoBehaviour
 {
-    public GameObject ARCamCanvas;
+    public GameObject clock_1;
     private Boolean isLogged = false;
 
 
@@ -17,6 +17,11 @@ public class ARCam : MonoBehaviour
     void Start()
     {
         iniciarDB();
+    }
+
+    void Update()
+    {
+        clock_1.GetComponent<Text>().text = DateTime.Now.ToString("HH:mm:ss");
     }
 
     private async void iniciarDB()
