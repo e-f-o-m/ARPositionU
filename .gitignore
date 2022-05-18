@@ -80,3 +80,4 @@ ehthumbs.db
 com.ptc.vuforia.engine-10.7.2.tgz
 
 ./Packages/*.tgz
+./Assets/Resources/VuforiaConfiguration*
