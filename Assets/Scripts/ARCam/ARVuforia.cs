@@ -18,14 +18,14 @@ public class ARVuforia : MonoBehaviour
 
     private Boolean isLogged = false;
     private string eventKeySelected = null;
-    private string placeKeySelected = null;
 
     private FirebaseController fc;
+    private string targetName;
 
-    private int day = 1;
+    private int day = 0;
     void OnEnable()
     {
-        //day = (int)DateTime.Now.DayOfWeek;
+        day = (int)DateTime.Now.DayOfWeek;
         iniciarDB();
     }
 
@@ -34,15 +34,14 @@ public class ARVuforia : MonoBehaviour
         fc = new FirebaseController();
         isLogged = await fc.CheckUser();
         eventos = await fc.getEventos();
-        horarios = await fc.getMiHorario();
         lugares = await fc.getLugares();
         if (isLogged)
         {
-            horarios = await fc.getMiHorario();
+            horarios = await fc.getMiHorarioEvent();
         }
         else
         {
-            Debug.Log("No hay horarios");
+            Debug.Log("No hay horario");
         }
     }
 
@@ -53,41 +52,73 @@ public class ARVuforia : MonoBehaviour
         button.GetComponent<Button>().colors = colors;
     }
 
-    public void OnTargetFound(string targetName)
+    public void OnTargetFound(string _targetName)
     {
-        double timeNow = DateTime.Now.Hour + (DateTime.Now.Minute / 60); 
-        Evento evento = getProximityEvent(targetName, timeNow);
-
+        targetName = _targetName;
+        double timeNow = day + ((DateTime.Now.Hour + (DateTime.Now.Minute / 60))/24); 
+        Evento evento = getProximityEvent(timeNow);
         setDataAR(evento);
     }
 
     public void OnTargetLost(string targetName)
     {
-        Debug.Log("targetName lost: " + targetName);
+        /* Debug.Log("targetName lost: " + targetName); */
     }
 
     private void setDataAR(Evento evento)
     {
+        string[] days = { "BtnLunes", "BtnMartes", "BtnMiercoles", "BtnJueves", "BtnViernes", "BtnSabado", "BtnDomingo"};
 
         if (evento != null)
         {
 
             string namePlace = lugares.Find(x => x.lugar_key == evento.lugar_key).nombre_lugar;
-            Debug.Log("4 xxxxxxx Nombre lugar: " + namePlace);
-            GameObject.Find("CanvasHologram/Panel/PanelMain/PanelLugar/Text").GetComponent<Text>().text = namePlace;
-            GameObject.Find("CanvasHologram/Panel/PanelMain/PanelResponsble/Text").GetComponent<Text>().text = evento.responsable;
+            
+            if (horarios.Count > 0){
+                foreach(Evento horario in horarios){
+                    Debug.Log("Horario: " + horario.evento_key);
+                }
+                Evento mEventoHorario = horarios.Find(x => x.evento_key == evento.evento_key);
+                if (mEventoHorario != null){
+                    GameObject.Find(targetName + "/CanvasHologram/Panel/PanelMain/PanelMensaje/Text").GetComponent<Text>().text = "Mi Horario";
+                }else{
+                    Debug.Log(" - - - - nulo");
+                    GameObject.Find(targetName + "/CanvasHologram/Panel/PanelMain/PanelMensaje/Text").GetComponent<Text>().text = "- -";
+                }
+            }else{
+                Debug.Log(" - - - - No hay horario");
+            }
 
-            GameObject.Find("CanvasHologram/Panel/PanelMain/PanelEvento/Text").GetComponent<Text>().text = evento.nombre_evento;
-            Debug.Log("5 xxxxxxx Nombre: " + evento.nombre_evento);
 
-            GameObject.Find("CanvasHologram/Panel/PanelClock/PanelStart/Text").GetComponent<Text>().text = evento.hora_inicio;
-            GameObject.Find("CanvasHologram/Panel/PanelClock/PanelEnd/Text").GetComponent<Text>().text = evento.hora_fin;
+            GameObject.Find(targetName + "/CanvasHologram/Panel/PanelMain/PanelLugar/Text").GetComponent<Text>().text = namePlace;
+            GameObject.Find(targetName + "/CanvasHologram/Panel/PanelMain/PanelEvento/Text").GetComponent<Text>().text = evento.nombre_evento;
+            GameObject.Find(targetName + "/CanvasHologram/Panel/PanelMain/PanelResponsble/Text").GetComponent<Text>().text = evento.responsable;
+
+            GameObject.Find(targetName + "/CanvasHologram/Panel/PanelClock/PanelStart/Text").GetComponent<Text>().text = evento.hora_inicio;
+            GameObject.Find(targetName + "/CanvasHologram/Panel/PanelClock/PanelEnd/Text").GetComponent<Text>().text = evento.hora_fin;
+
+            foreach(string _day in days){
+                //restaurar los colores
+                var _colors = GameObject.Find(targetName + "/CanvasHologram/Panel/PanelCalendar/" + _day).GetComponent<Button>().colors;
+                _colors.normalColor = Color.white;
+                GameObject.Find(targetName + "/CanvasHologram/Panel/PanelCalendar/" + _day).GetComponent<Button>().colors = _colors;
+
+            }
+
+            GameObject objectDay = GameObject.Find(targetName + "/CanvasHologram/Panel/PanelCalendar/" + days[evento.dia - 1]);
+            var colors = objectDay.GetComponent<Button>().colors;            
+            colors.normalColor = new Color(0.709f,0.425f,0.816f,0.816f);
+            objectDay.GetComponent<Button>().colors = colors;
+
         }
         else
         {
             Debug.Log("No hay eventos");
         }
     }
+
+
+
 
     public void OnNextEvent()
     {
@@ -102,26 +133,31 @@ public class ARVuforia : MonoBehaviour
     {
         if (eventKeySelected != null)
         {
+            Debug.Log("dia next: " + day);
             Evento newEvent = null;
 
             Evento mEvent = eventos.Find(x => x.evento_key == eventKeySelected);
 
-            double hoursAdd = srtTimeTo24(mEvent.hora_fin) + nextToggle;
+            double hoursAdd = 0;
+            if(nextToggle == 1){
+                hoursAdd = srtTimeTo24(mEvent.hora_fin) + nextToggle;
+            }else{
+                hoursAdd = srtTimeTo24(mEvent.hora_inicio) + nextToggle;
+            }
 
             for (int i = 0; i < 24; i++)
             {
-                newEvent = getProximityEvent(mEvent.lugar_key, hoursAdd);
+                newEvent = getProximityEvent(day + (hoursAdd / 24));
                 if (newEvent != null)
                 {
                     if (newEvent.evento_key != mEvent.evento_key)
                     {
                         eventKeySelected = newEvent.evento_key;
-                        day = newEvent.dia;
                         setDataAR(newEvent);
                         break;
                     }
                 }
-                hoursAdd += nextToggle * 2 ;
+                hoursAdd += nextToggle * 2;
             }
         }
         else
@@ -130,10 +166,12 @@ public class ARVuforia : MonoBehaviour
         }
     }
 
-    private Evento getProximityEvent(string targetName, double timeNow)
+    private Evento getProximityEvent(double timeNow)
     {
         int previousDay = 0;
-        double proximityStarHour = 1000.0;
+        double proximityEvent = 1000.0;
+        double proximityTemp = 0;
+        
         Evento evento = null;
 
         foreach (Evento _evento in eventos)
@@ -143,51 +181,33 @@ public class ARVuforia : MonoBehaviour
             {
                 double hourEventFull = srtTimeTo24(_evento.hora_fin);
 
-                //break if add a day and exist event selected
-                if (previousDay < _evento.dia && proximityStarHour < 500)
-                {
-                    break;
-                }
-
-                previousDay = _evento.dia;
-
                 int daysSpace = _evento.dia - day;
-
-                /* Debug.Log("11 uuuuuuuu daysSpace: " + daysSpace);
-                Debug.Log("22 uuuuuuuu day: " + day);
-                Debug.Log("32 uuuuuuuu evento.dia: " + _evento.dia); */
 
                 if (daysSpace < 0)
                 {
-                    hourEventFull += 24 * (7 + Math.Abs(daysSpace) - day);
-                }else if (daysSpace > 0){
-                    hourEventFull += 24 * daysSpace;    
+                    proximityTemp = hourEventFull + (24 * (7 - day +  _evento.dia)); // daysSpace resta
+                } else if (daysSpace > 0){
+                    proximityTemp = hourEventFull + (24 * _evento.dia);
                 }
 
-
-                if (timeNow <= hourEventFull)
+                
+                if (proximityTemp > timeNow && proximityTemp <= proximityEvent)
                 {
-                    if (Math.Abs(hourEventFull - timeNow) <= proximityStarHour)
+                    proximityEvent = 0 + proximityTemp;
+                    evento = _evento;                    
+                    //save event key (for nexr of previous btn)
+                    eventKeySelected = evento.evento_key;
+                    if (proximityEvent == 0)
                     {
-                        proximityStarHour = Math.Abs(hourEventFull - timeNow);
-
-                        evento = _evento;
-                        
-                        //save event key (for nexr of previous btn)
-                        eventKeySelected = evento.evento_key;
-                        
-                        Debug.Log("ppppppro prox: " + proximityStarHour);
-                        Debug.Log("nnnnname name :  " + evento.nombre_evento);
-
-                        if (proximityStarHour == 0)
-                        {
-                            break;
-                        }
+                        break;
                     }
-
-
                 }
+                
             }
+        }
+        if (evento != null)
+        {
+            day = evento.dia;
         }
         return evento;
     }

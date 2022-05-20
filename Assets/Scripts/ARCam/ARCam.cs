@@ -9,9 +9,7 @@ using UnityEngine.SceneManagement;
 public class ARCam : MonoBehaviour
 {
     private Boolean isLogged = false;
-
-
-    /* private FirebaseController fc;
+    private FirebaseController fc;
     void Start()
     {
         iniciarDB();
@@ -33,7 +31,7 @@ public class ARCam : MonoBehaviour
         {
             SceneManager.LoadScene("Login");
         }
-    } */
+    }
 
     
 }

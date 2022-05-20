@@ -230,6 +230,50 @@ public class FirebaseController
         return eventos;
     }
 
+    
+    public async Task<List<Evento>> getMiHorarioEvent()
+    {
+        List<MiHorario> miHorarios = new List<MiHorario>();
+        List<Evento> eventos = new List<Evento>();
+        await reference.Child(USUARIOS_REF).Child(TOKEN_USER).Child(HORARIO_REF).GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Debug.Log("Error al recuperar datos de evento eventos: Mi horario");
+            }
+            else if (task.IsCompleted)
+            {
+                DataSnapshot snapshot = task.Result;
+                foreach (var item in snapshot.Children)
+                {
+                    MiHorario miHorario = JsonUtility.FromJson<MiHorario>(item.GetRawJsonValue());
+                    miHorarios.Add(miHorario);
+                }
+            }
+        });
+
+
+        foreach (MiHorario miHorario in miHorarios)
+        {
+            await reference.Child(EVENTOS_REF).Child(miHorario.evento_key).GetValueAsync().ContinueWithOnMainThread(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    Debug.Log("Error al recuperar datos de evento eventos: Mi horario");
+                }
+                else if (task.IsCompleted)
+                {
+                    DataSnapshot snapshot = task.Result;
+                    Evento evento = JsonUtility.FromJson<Evento>(snapshot.GetRawJsonValue());
+                    eventos.Add(evento);
+                }
+
+            });
+        }
+        return eventos;
+    }
+
+
 
     public async Task<List<Lugar>> getLugares()
     {
