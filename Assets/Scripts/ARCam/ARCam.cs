@@ -6,22 +6,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-
 public class ARCam : MonoBehaviour
 {
-    public GameObject clock_1;
     private Boolean isLogged = false;
 
 
-    private FirebaseController fc;
+    /* private FirebaseController fc;
     void Start()
     {
         iniciarDB();
-    }
-
-    void Update()
-    {
-        clock_1.GetComponent<Text>().text = DateTime.Now.ToString("HH:mm:ss");
     }
 
     private async void iniciarDB()
@@ -40,7 +33,7 @@ public class ARCam : MonoBehaviour
         {
             SceneManager.LoadScene("Login");
         }
-    }
+    } */
 
     
 }
