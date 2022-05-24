@@ -74,7 +74,7 @@ public class Eventos : MonoBehaviour
 
             Color selectedColor = new Color(79/255.0f, 140/255.0f, 238/255.0f);
             string [] days  = {"Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"};
-            string day = days[_evento.dia];
+            string day = days[_evento.dia - 1];
             g.transform.Find("marginPanel/"+day).GetComponent<Text>().color = selectedColor;
             horarios.Add(g);
         }          
