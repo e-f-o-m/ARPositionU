@@ -97,7 +97,7 @@ public class Login : MonoBehaviour
                 codigoEtRe.GetComponent<UnityEngine.UI.InputField>().interactable = false;
                 var res = await fc.registerNewUser(stCorreoEtRe, stContrasenaEtRe, stNombreEtRe, stCodigoEtRe);
                 if(res != null){
-                    RetroalimentacionTxRe.GetComponent<Text>().text = "Registro exitoso\nConfirme el correo que le hemos enviado para activar su cuenta";
+                    RetroalimentacionTxRe.GetComponent<Text>().text = "Registro exitoso\nSe envió un correo para activar su cuenta";
                 }else{
                     RetroalimentacionTxRe.GetComponent<Text>().text = "Error al registrar";
                 }

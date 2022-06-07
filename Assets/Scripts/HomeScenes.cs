@@ -1,4 +1,4 @@
-using System.Collections;
+/* using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
@@ -39,3 +39,4 @@ public class HomeScenes : MonoBehaviour
         panel.SetActive(false);
     }
 }
+ */

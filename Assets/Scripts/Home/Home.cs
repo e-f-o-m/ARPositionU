@@ -27,6 +27,7 @@ public class Home : MonoBehaviour
     public ScrollRect scrollRect;
     [Header ("Views Home")]
     public GameObject AceptarBtnH;
+    public GameObject AdminBtnH;
 
     [Header ("Dialog Select")]
     public GameObject DialogoValiHo;
@@ -41,6 +42,8 @@ public class Home : MonoBehaviour
     private string eventKeySelected = null;
 
     private FirebaseController fc;
+
+    private Usuario user;
     void OnEnable()
     {
         horarios = horarios = new List<GameObject>();
@@ -60,6 +63,24 @@ public class Home : MonoBehaviour
         isLogged = await fc.CheckUser();
         eventos = await fc.getMiHorario();
         lugares = await fc.getLugares();
+
+        if (isLogged)
+        {
+            user = await fc.getUserData();
+            if(user != null)
+            {
+                Debug.Log(" p pp p p p user: " + user.rol);
+                if(user.rol > 0 )
+                {
+                    AdminBtnH.SetActive(true);
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("No hay usuario");
+        }
+
         generateGaObEventos();
     }
 

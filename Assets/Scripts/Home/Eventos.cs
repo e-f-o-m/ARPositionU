@@ -7,6 +7,10 @@ using UnityEngine.UI;
 using Firebase;
 using Firebase.Database;
 using Firebase.Extensions;
+//regex
+using System.Text.RegularExpressions;
+//normalize form
+using System.Text;
 
 public class Eventos : MonoBehaviour
 {
@@ -21,39 +25,69 @@ public class Eventos : MonoBehaviour
 
     [Header("search")]
     public GameObject SearchEtEv;
-    
-    [Header ("Dialog Select")]
+
+    [Header("Dialog Select")]
     public GameObject DialogoValiEv;
     public GameObject DescripcionTvDiEv;
+    public GameObject NewEventBtnEv;
+    public GameObject EditarBtnDiEv;
 
     [Header("Private")]
     private int count = 0;
-    private List<GameObject> horarios = new List<GameObject>();
-    private List<Evento> eventos = new List<Evento>();
-    private List<Lugar> lugares = new List<Lugar>();
+    private List<GameObject> eventosGmOb;
+    private List<Evento> eventos;
+    private List<Lugar> lugares;
     private string eventKeySelected = null;
     private FirebaseController fc;
 
+    private Usuario user;
+
     //private HomeScenes scenes = new HomeScenes();
 
-    void Start()
+    void OnEnable()
     {
+        eventosGmOb = new List<GameObject>();
+        eventos = new List<Evento>();
+        lugares = new List<Lugar>();
+
         iniciarDB();
     }
 
+
     void OnDisable()
     {
-        for(int i=0; i<horarios.Count; i++) {
-            Destroy(horarios[i].gameObject);
+        for (int i = 0; i < eventosGmOb.Count; i++)
+        {
+            Destroy(eventosGmOb[i].gameObject);
         }
     }
 
     private async void iniciarDB()
     {
         fc = new FirebaseController();
-        await fc.CheckUser();
+        bool isLogged = await fc.CheckUser();
         eventos = await fc.getEventos();
         lugares = await fc.getLugares();
+
+        Debug.Log("is login " + isLogged);
+        if (isLogged)
+        {
+            user = await fc.getUserData();
+            if (user != null)
+            {
+                Debug.Log("x xx x xx x x user: " + user.rol);
+                if (user.rol > 0)
+                {
+                    NewEventBtnEv.SetActive(true);
+                    EditarBtnDiEv.SetActive(true);
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("No hay usuario");
+        }
+
         generateGaObEventos();
     }
 
@@ -64,27 +98,29 @@ public class Eventos : MonoBehaviour
             var _evento = eventos[i];
             GameObject g = (GameObject)Instantiate(cardItem, contentAmbientes.transform);
             g.SetActive(true);
-            
-            g.transform.Find("marginPanel/id").GetComponent<Text>().text = ""+_evento.evento_key;
+
+            g.transform.Find("marginPanel/id").GetComponent<Text>().text = "" + _evento.evento_key;
 
             string _lugar = lugares.Find(x => x.lugar_key == _evento.lugar_key).nombre_lugar;
             g.transform.Find("marginPanel/Salon").GetComponent<Text>().text = _lugar;
-            
+
             g.transform.Find("marginPanel/Evento").GetComponent<Text>().text = _evento.nombre_evento;
 
-            Color selectedColor = new Color(79/255.0f, 140/255.0f, 238/255.0f);
-            string [] days  = {"Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"};
+            Color selectedColor = new Color(79 / 255.0f, 140 / 255.0f, 238 / 255.0f);
+            string[] days = { "Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do" };
             string day = days[_evento.dia - 1];
-            g.transform.Find("marginPanel/"+day).GetComponent<Text>().color = selectedColor;
-            horarios.Add(g);
-        }          
+            g.transform.Find("marginPanel/" + day).GetComponent<Text>().color = selectedColor;
+            eventosGmOb.Add(g);
+        }
     }
 
-    public void selectItemAmbientes(GameObject id_event){
+    public void selectItemAmbientes(GameObject id_event)
+    {
         OpenPanelDialog(id_event.GetComponent<Text>().text);
     }
 
-    public void OpenPanelDialog(string id_event){
+    public void OpenPanelDialog(string id_event)
+    {
         eventKeySelected = id_event;
         Boolean isOpen = DialogoValiEv.activeSelf;
         DialogoValiEv.SetActive(!isOpen);
@@ -93,7 +129,16 @@ public class Eventos : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    public void aceptarDialog(){
+    private void closetDialog()
+    {
+        if (DialogoValiEv.activeSelf)
+        {
+            DialogoValiEv.SetActive(false);
+        }
+    }
+
+    public void aceptarDialog()
+    {
         MiHorario miHorario = new MiHorario();
         miHorario.evento_key = eventKeySelected;
         fc.addHorario(miHorario);
@@ -120,28 +165,48 @@ public class Eventos : MonoBehaviour
 
     public void filtrarEventos()
     {
-        string _search = SearchEtEv.GetComponent<InputField>().text;
-        if (_search.Length > 0)
+        try
         {
-            for (int i = 0; i < horarios.Count; i++)
+
+
+            string _search = SearchEtEv.GetComponent<InputField>().text;
+            if (_search.Length > 0)
             {
-                if (horarios[i].transform.Find("marginPanel/Evento").GetComponent<Text>().text.Contains(_search)
-                || horarios[i].transform.Find("marginPanel/Salon").GetComponent<Text>().text.Contains(_search))
+                for (int i = 0; i < eventosGmOb.Count; i++)
                 {
-                    horarios[i].SetActive(true);
+
+                    string strSalon = eventosGmOb[i].transform.Find("marginPanel/Evento").GetComponent<Text>().text;
+                    string strEvento = eventosGmOb[i].transform.Find("marginPanel/Salon").GetComponent<Text>().text;
+
+                    //palabras sin tildes y en minusculas
+                    strSalon = Regex.Replace(strSalon.Normalize(NormalizationForm.FormD), @"[^a-zA-z0-9 ]+", "").ToLower();
+                    strEvento = Regex.Replace(strEvento.Normalize(NormalizationForm.FormD), @"[^a-zA-z0-9 ]+", "").ToLower();
+                    _search = Regex.Replace(_search.Normalize(NormalizationForm.FormD), @"[^a-zA-z0-9 ]+", "").ToLower();
+
+                    if (strSalon.Contains(_search) || strEvento.Contains(_search))
+                    {
+                        eventosGmOb[i].SetActive(true);
+                    }
+                    else
+                    {
+                        Debug.Log("strSalon: " + strSalon
+                        + "\nstrEvento: " + strEvento
+                        + "\n_search: " + _search);
+                        eventosGmOb[i].SetActive(false);
+                    }
                 }
-                else
+            }
+            else
+            {
+                for (int i = 0; i < eventosGmOb.Count; i++)
                 {
-                    horarios[i].SetActive(false);
+                    eventosGmOb[i].SetActive(true);
                 }
             }
         }
-        else
+        catch (System.Exception)
         {
-            for (int i = 0; i < horarios.Count; i++)
-            {
-                horarios[i].SetActive(true);
-            }
+            Debug.Log("Error al filtrar eventos");
         }
     }
 
@@ -149,6 +214,18 @@ public class Eventos : MonoBehaviour
     {
         MiHorarioPanel.SetActive(true);
         EventosPanel.SetActive(false);
+    }
+
+    void Update()
+    {
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                closetDialog();
+                BackPress();
+            }
+        }
     }
 
 }

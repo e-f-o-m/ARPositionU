@@ -16,6 +16,6 @@ public class Usuario
         this.nombre = nombre;
         this.correo = correo;
         this.codigo = codigo;
-        this.rol = rol;
+        this.rol = rol; //0: usuario, 1: admin 2: super admin
     }
 }

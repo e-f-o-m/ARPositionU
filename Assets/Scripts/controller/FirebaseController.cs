@@ -49,7 +49,9 @@ public class FirebaseController
                             {
                                 Debug.Log("User is verified");
                                 return true;
-                            }else{
+                            }
+                            else
+                            {
                                 Debug.Log("User is not verified");
                                 return false;
                             }
@@ -163,7 +165,7 @@ public class FirebaseController
                 return null;
             }
             return ID;
-        });    
+        });
     }
 
     public async Task<String> updateEvento(Evento _evento)
@@ -230,7 +232,7 @@ public class FirebaseController
         return eventos;
     }
 
-    
+
     public async Task<List<Evento>> getMiHorarioEvent()
     {
         List<MiHorario> miHorarios = new List<MiHorario>();
@@ -272,8 +274,6 @@ public class FirebaseController
         }
         return eventos;
     }
-
-
 
     public async Task<List<Lugar>> getLugares()
     {
@@ -443,7 +443,8 @@ public class FirebaseController
 
     }
 
-    public async Task<Boolean> deleteUser(){
+    public async Task<Boolean> deleteUser()
+    {
         await reference.Child(USUARIOS_REF).Child(user.UserId).RemoveValueAsync().ContinueWith(task =>
         {
             if (task.IsCanceled)
@@ -515,9 +516,37 @@ public class FirebaseController
         return usuario;
     }
 
+
+    public async Task<List<MiHorario>> getMiHorarioUser(string usuario_key)
+    {
+        List<MiHorario> miHorarios = new List<MiHorario>();
+        await reference.Child(USUARIOS_REF).Child(usuario_key).Child(HORARIO_REF).GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Debug.Log("Error al recuperar datos de evento eventos: Mi horario");
+            }
+            else if (task.IsCompleted)
+            {
+                DataSnapshot snapshot = task.Result;
+                foreach (var item in snapshot.Children)
+                {
+                    MiHorario miHorario = JsonUtility.FromJson<MiHorario>(item.GetRawJsonValue());
+                    miHorarios.Add(miHorario);
+                }
+            }
+        });
+        return miHorarios;
+    }
+
     public async Task<Boolean> updateUsuario(Usuario usuario)
     {
-        await reference.Child(USUARIOS_REF).Child(usuario.usuario_key).SetRawJsonValueAsync(JsonUtility.ToJson(usuario)).ContinueWithOnMainThread(task =>
+        var h = await reference.Child(USUARIOS_REF).Child(usuario.usuario_key).Child(HORARIO_REF).GetValueAsync().ContinueWithOnMainThread(task =>
+        {
+            return task.Result;
+        });
+
+        bool validateUser = await reference.Child(USUARIOS_REF).Child(usuario.usuario_key).SetRawJsonValueAsync(JsonUtility.ToJson(usuario)).ContinueWithOnMainThread(task =>
         {
             if (task.IsCanceled)
             {
@@ -531,7 +560,30 @@ public class FirebaseController
             }
             return true;
         });
-        return true;
+        
+
+        if (validateUser == true && h != null)
+        {
+            //GetRawJsonValue lista a string
+            return await reference.Child(USUARIOS_REF).Child(usuario.usuario_key).Child(HORARIO_REF).SetRawJsonValueAsync(h.GetRawJsonValue()).ContinueWithOnMainThread(task =>
+            {
+                if (task.IsCanceled)
+                {
+                    Debug.LogError("SetRawJsonValueAsync was canceled.");
+                    return false;
+                }
+                if (task.IsFaulted)
+                {
+                    Debug.LogError("SetRawJsonValueAsync encountered an error: " + task.Exception);
+                    return false;
+                }
+                return true;
+            });
+        }
+        else
+        {
+            return false;
+        }
     }
 
 

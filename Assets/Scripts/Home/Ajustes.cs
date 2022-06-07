@@ -12,12 +12,15 @@ public class Ajustes : MonoBehaviour
     public GameObject CambiarNomobreTvAj;
     public GameObject CambiarCodigoTvAj;
     public GameObject AjustesPanel; 
+    public GameObject HomePanel; 
     public GameObject EliminarCuentaBtnAj; 
 
     [Header("Dialog Select")]
     public GameObject DialogoValiHo;
     public GameObject DescripcionTvDiHo;
+    public GameObject DialogoDataUser;
     private int optionBtnSelected = 0;
+    private int optionUpdate = 0;
     private Usuario user;
     private FirebaseController fc;
     
@@ -78,9 +81,71 @@ public class Ajustes : MonoBehaviour
     }
 
     public async void eliminarCuenta(){
-        Boolean res = await fc.deleteUser();
+        bool res = await fc.deleteUser();
         if(res){
             SceneManager.LoadScene("ARCam");
         }
     }
+
+
+    public async void setDataFirebase(Usuario usuario)
+    {
+        bool b = await fc.updateUsuario(usuario);
+        if(b){
+            setDataUserToViews();
+        }
+        closetDialogUser();
+    }
+
+    public void updateDataUser(GameObject input){
+        string strData = input.GetComponent<Text>().text;
+        if(optionUpdate == 0){
+            UpdateNameUser(strData);
+        }else{
+            UpdateCodeUser(strData);
+        }
+    }
+
+    public void UpdateNameUser(string name){
+        user.nombre = name;
+        setDataFirebase(user);
+    }
+
+    public void UpdateCodeUser(string code){
+        user.codigo = code;
+        setDataFirebase(user);
+    }
+
+
+    public void closetDialogUser(){
+        DialogoDataUser.SetActive(false);
+    }
+
+    public void openDialogUser(int option){
+        if(option == 0){
+            DialogoDataUser.SetActive(true);
+            DialogoDataUser.transform.Find("TituloTvDiHo").GetComponent<Text>().text = "Cambiar Nombre";
+            DialogoDataUser.transform.Find("UserInput").GetComponent<InputField>().text = user.nombre;
+        }else if(option == 1){
+            DialogoDataUser.SetActive(true);
+            DialogoDataUser.transform.Find("TituloTvDiHo").GetComponent<Text>().text = "Cambiar Código";
+            DialogoDataUser.transform.Find("UserInput").GetComponent<InputField>().text = user.codigo;
+        }
+        optionUpdate = option;
+    }
+
+
+        void Update()
+    {
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                AjustesPanel.SetActive(false);
+                HomePanel.SetActive(true);
+            }
+        }
+    }
+
+
 }

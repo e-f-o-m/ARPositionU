@@ -29,7 +29,7 @@ public class Usuarios : MonoBehaviour
     private FirebaseController fc;
     private Usuario usuario = new Usuario();
     private List<Usuario> usuarios = new List<Usuario>();
-    private List<GameObject> usuariosGaOb = new List<GameObject>();
+    private List<GameObject> usuariosGaOb;
     private Boolean isRepet = false;
     private int optionRol = 0;
     string usuarioKeySelected = "";
@@ -38,6 +38,7 @@ public class Usuarios : MonoBehaviour
     // set data vies
     void OnEnable()
     {
+        usuariosGaOb = new List<GameObject>();
         iniciarDB();
     }
 
@@ -70,7 +71,7 @@ public class Usuarios : MonoBehaviour
                     TgSAdmin.GetComponent<Toggle>().isOn = false;
                 if (TgEstudiante.GetComponent<Toggle>().isOn)
                     TgEstudiante.GetComponent<Toggle>().isOn = false;
-            } else {
+            } else if (_option == 2) {
                 if (TgAdmin.GetComponent<Toggle>().isOn)
                     TgAdmin.GetComponent<Toggle>().isOn = false;
                 if (TgEstudiante.GetComponent<Toggle>().isOn)
